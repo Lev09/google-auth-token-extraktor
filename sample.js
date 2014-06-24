@@ -6,13 +6,15 @@ var googleapis = require('googleapis');
 var OAuth2 = googleapis.auth.OAuth2;
 
 var oauth2Client = new OAuth2(
-	'38526860757-k32pm3d9v0c0lg0pgff9lfndfvlkae0h.apps.googleusercontent.com', 
-	'd1NYp4UbZVMdxbMi9UjMu-8q',
+	'88647090605-egvm4eu2ljl1icknrvvjstin26kd5ag9.apps.googleusercontent.com', 
+	'sj_q4edzXZBUop0GVgJkD0Lk',
 	'http://127.0.0.1:3033/oauth/google/callback');
 
 app.get('/auth/google', function(req, res) {
-
-	var scopes = ['https://www.googleapis.com/auth/calendar'];
+	var scopes = [
+		'https://www.googleapis.com/auth/calendar',
+		'https://www.googleapis.com/auth/userinfo.profile'
+	];
 
 	var url = oauth2Client.generateAuthUrl({
 		access_type: 'offline',
@@ -40,7 +42,11 @@ publisher.bind('tcp://*:6001', function(error) {
 });
 
 var sendCode = function(code) {
-	publisher.send(code);
+	var authData = {
+		session: 'ghgf5hg5h4g5jh4hg5jhg56gf',
+		code: code
+	};
+	publisher.send(JSON.stringify(authData));
 };
 
 app.listen(3033, function() {

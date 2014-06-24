@@ -1,10 +1,4 @@
-var zmq = require('zmq');
 var googleapis = require('googleapis');
-var argv = require('optimist').default({
-	bind: 'tcp://*:6003',
-	connect: 'tcp://localhost:6001'
-}).argv;
-
 var OAuth2 = googleapis.auth.OAuth2;
 
 var newOauth2Client = function() {
@@ -15,34 +9,19 @@ var newOauth2Client = function() {
 	return oauth2Client;
 };
 
-var subscriber = zmq.socket('sub');
-subscriber.connect(argv.connect);
-subscriber.subscribe('');
-console.log("listening port: ", argv.connect);
+module.exports = function(code, done) {
 
-subscriber.on('message', function(code) {
 	var oauth2Client = newOauth2Client();
-
 	oauth2Client.getToken(code, function(error, tokens) {
+		
 		if(error) {
 			console.log("error ", error);
 		}
 		else {
 			oauth2Client.setCredentials(tokens);
 			console.log(tokens);
-			sendtokens(tokens);
+			done(tokens);
 		}
 	});
-});
-
-var publisher = zmq.socket('pub');
-publisher.bind(argv.bind, function(error) {
-	if(error) {
-		console.log(error);
-	}
-	console.log("binding on port: ", argv.bind);
-});
-
-var sendtokens = function(tokens) {
-	publisher.send(JSON.stringify(user));
+	
 };
